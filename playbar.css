@@ -1,0 +1,18 @@
+*{
+    box-sizing: border-box;
+}
+
+.playbar{
+    width: 300px;
+    height: 10px;
+}
+.playbar{
+    border: 1px solid #666;
+    border-radius: 5px;
+}
+.currenttime{
+    background: red;
+    border-radius: 4px;
+    height: 8px;
+    width: 0;
+}

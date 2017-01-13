@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<link rel="stylesheet" href="1.css">
+</head>
+<body>
+	<button id="prev"> &lt; </button>
+	<button id="control">播放</button>
+	<button id="next"> &gt; </button>
+	<button id="replay">重新播放</button>
+	<audio src="五月天 - 星空.mp3" id="audio" controls="controls"></audio>
+	<div id="playbar" class="playbar">
+		<div id="currentTime" class="currenttime"></div>
+	</div>
+	<!-- audio标签有四个属性 -->
+
+	<script>
+		var audio = document.querySelector('#audio');
+		var controlBtn = document.querySelector('#control');
+		var volume;
+		// 播放条填充定时器
+		var playBarTimer;
+
+
+		/* 监听audio的状态 Begin */
+		// 声明一个变量为用来存储表示audio状态的值以便于进行判断
+		var audioStatus = 'paused';
+		audio.addEventListener('playing', function () {
+			audioStatus = 'playing';
+			controlBtn.innerHTML = '停止';
+			// 播放条
+			playBarTimer = setInterval(function () {
+				var currentTime = document.querySelector('#currentTime');
+				var percentage = audio.currentTime/audio.duration;
+				// Question: JS最好不要用来定义样式，那么这里应该怎么写
+				currentTime.style.width = 298*percentage + 'px';
+			}, 1000);
+			/* 播放条 End */
+		});
+		audio.addEventListener('pause', function () {
+			audioStatus = 'paused';
+			controlBtn.innerHTML = '播放';
+			// 清除播放条定时器
+			// Question: 此时清除是否会存在其他Bug
+			clearInterval(playBarTimer);
+		});
+		/* 监听audio的状态 End */
+
+		/* 播放、停止按钮 Begin */
+		controlBtn.onclick = function () {
+			// 通过变量的值来判断其是否处于播放状态，以便用按钮来操控
+			if (audioStatus === 'playing') {
+				currentVolume = audio.volume;		// 如果在播放状态
+				musicPausedTimer = setTimeout(function () {	// 开启延迟执行定时器，延迟歌曲的停止
+					audio.pause();
+				}, 1000);
+				volumeDownSmooth();			// 开启重复执行定时器，逐渐减小音量
+			}else{							// 如果在停止状态
+				audio.play();
+				volumeUpSmooth();			// 开启重复执行定时器，逐渐增加音量
+			}
+		};
+		/* 播放、停止按钮 End */
+
+		/* 重新播放 Begin */
+		var replay = document.querySelector('#replay');
+		replay.onclick = function () {
+			// currentTime 音频中的当前播放位置（以秒计）
+			audio.currentTime = 0;
+			volumeUpSmooth();
+			audio.play();
+		};
+		/* 重新播放 End */
+
+		/* 上一首、下一首 Begin */
+		var nextMusic = document.querySelector('#next');
+		var prevMusic = document.querySelector('#prev');
+		var playList = [
+			'五月天 - 星空.mp3',
+			'荒木毬菜 - 流れ星.mp3',
+			'Different Heaven - Nekozilla.mp3',
+			'后弦 - 下完这场雨.mp3',
+			'田中理恵 - Fields of hope.mp3'
+		];
+		/* 上一首、下一首 End */
+
+
+		var currentVolume = 1;
+		/* 音量平缓减小 Begin */
+		function volumeDownSmooth () {
+			var musicPausedTimer = setInterval(function () {
+				audio.volume -= currentVolume/100;
+				if (audio.volume <= 0.01) {
+					audio.volume = 0;
+					clearInterval(musicPausedTimer);
+				}
+			}, 10);
+		};
+		/* 音量平缓减小 End */
+
+		/* 音量平缓增加 Begin */
+		function volumeUpSmooth () {
+			audio.volume = 0;		// 刚进去，音量默认为1，所以需要将音量重置为0才能使其逐渐增加，否则音量会大于1，导致报错
+			var volumeUpTimer = setInterval(function () {
+				audio.volume += currentVolume/100;
+				if (audio.volume >= 0.99) {
+					audio.volume = currentVolume;
+					clearInterval(volumeUpTimer);
+				}
+			}, 10);
+		};
+		/* 音量平缓增加 End */
+
+
+	</script>
+</body>
+</html>
